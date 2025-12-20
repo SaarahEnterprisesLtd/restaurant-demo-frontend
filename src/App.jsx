@@ -11,7 +11,7 @@ export default function App() {
       <nav style={{ padding: 16, borderBottom: "1px solid #ddd" }}>
         <Link to="/">Home</Link> |{" "}
         <Link to="/menu">Menu</Link> |{" "}
-        <Link to="/orders">My Orders</Link> |{" "}
+        <Link to="/orders">My Orderss</Link> |{" "}
         <Link to="/admin">Admin</Link>
       </nav>
 
