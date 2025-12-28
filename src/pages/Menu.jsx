@@ -24,6 +24,7 @@ export default function Menu() {
   useEffect(() => {
     (async () => {
       try {
+        console.log("calling menu")
         const data = await apiGetMenu();
         setItems(Array.isArray(data) ? data : data?.items ?? []);
       } catch {

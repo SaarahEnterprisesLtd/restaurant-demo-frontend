@@ -2,7 +2,6 @@ import axios from "axios";
 
 const isDev = import.meta.env.MODE === "development";
 
-console.log("AXIOS baseURL =", baseURL);
 
 const baseURL = isDev
   ? "/api"
