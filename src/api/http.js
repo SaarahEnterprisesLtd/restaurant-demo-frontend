@@ -1,25 +1,13 @@
 import axios from "axios";
 
-const baseURL =
-  import.meta.env.MODE === "development"
-    ? "/api" // dev -> Vite proxy
-    : import.meta.env.VITE_API_URL; // prod -> must be https://api.your-domain.com
+const isDev = import.meta.env.MODE === "development";
+
+const baseURL = isDev
+  ? "/api"
+  : (import.meta.env.VITE_API_URL || "https://saarah-eats-9gof7.ondigitalocean.app");
 
 export const http = axios.create({
   baseURL,
   withCredentials: true,
 });
-
-http.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    const msg =
-      err?.response?.data?.message ||
-      err?.response?.data?.error ||
-      err?.message ||
-      "Request failed";
-    err.userMessage = msg;
-    return Promise.reject(err);
-  }
-);
 
