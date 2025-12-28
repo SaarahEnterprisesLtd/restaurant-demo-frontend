@@ -1,27 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-export default function Login() {
-  const { login, refreshMe, isAuthed, booting } = useAuth();
+export default function Register() {
+  const { register } = useAuth();
   const nav = useNavigate();
-  const loc = useLocation();
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [err, setErr] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  // If already logged in, redirect immediately based on role
-  useEffect(() => {
-    if (!booting && isAuthed) {
-      refreshMe().then((data) => {
-        const u = data?.user ?? data;
-        if (u?.role === "admin") nav("/admin/menu", { replace: true });
-        else nav("/menu", { replace: true });
-      });
-    }
-  }, [booting, isAuthed, nav, refreshMe]);
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -29,17 +19,18 @@ export default function Login() {
     setSubmitting(true);
 
     try {
-      const cleanEmail = email.trim().toLowerCase();
-      await login(cleanEmail, password);
+      const payload = {
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+      };
 
-      // Always rely on /auth/me for canonical role
-      const data = await refreshMe();
-      const u = data?.user ?? data;
+      await register(payload);
 
-      if (u?.role === "admin") nav("/admin/menu", { replace: true });
-      else nav("/menu", { replace: true });
+      // Since backend sets cookie on register, send them straight in
+      nav("/menu", { replace: true });
     } catch (e2) {
-      setErr(e2.userMessage || e2.message || "Login failed");
+      setErr(e2.userMessage || e2.message || "Register failed");
     } finally {
       setSubmitting(false);
     }
@@ -47,9 +38,17 @@ export default function Login() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-10">
-      <h1 className="text-2xl font-bold">Login</h1>
+      <h1 className="text-2xl font-bold">Register</h1>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-3">
+        <input
+          className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 outline-none"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          autoComplete="name"
+          required
+        />
         <input
           className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 outline-none"
           placeholder="Email"
@@ -59,14 +58,14 @@ export default function Login() {
           inputMode="email"
           required
         />
-
         <input
           className="w-full rounded-xl bg-white/5 border border-white/10 px-3 py-2 outline-none"
-          placeholder="Password"
+          placeholder="Password (min 8 chars)"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
+          autoComplete="new-password"
+          minLength={8}
           required
         />
 
@@ -76,14 +75,14 @@ export default function Login() {
           disabled={submitting}
           className="w-full rounded-xl bg-emerald-500 px-4 py-2 font-medium text-black disabled:opacity-60"
         >
-          {submitting ? "Signing in..." : "Sign in"}
+          {submitting ? "Creating..." : "Create account"}
         </button>
       </form>
 
       <div className="mt-4 text-sm opacity-80">
-        No account?{" "}
-        <Link className="underline" to="/register">
-          Register
+        Have an account?{" "}
+        <Link className="underline" to="/login">
+          Login
         </Link>
       </div>
     </div>
